@@ -12,8 +12,7 @@ class UserService {
             throw ApiError.BadRequest(`Пользователь с таким email существует - ${email}`)
         }
         const hashPassword = await bcrypt.hash(password, 3)
-        const activationLink = uuid.v4()
-        const user = await User.create({ email, password: hashPassword, role, activationLink })
+        const user = await User.create({ email, password: hashPassword, role })
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({ ...userDto })
         await tokenService.saveToken(userDto.id, tokens.refreshToken)

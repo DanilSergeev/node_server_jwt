@@ -95,7 +95,7 @@ class UserController {
             if (!id) {
                 return next(ApiError.BadRequest("ID не передан"))
             }
-            await userService.updateUser(id)
+            await userService.deleteUser(id)
             res.json("Удалённо")
         } catch (error) {
             next(error)
