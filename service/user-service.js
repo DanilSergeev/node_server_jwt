@@ -6,13 +6,14 @@ const UserDto = require('../dtos/user-dto');
 const ApiError = require("../exceptions/api-error")
 
 class UserService {
-    async registration(email, password, role = "USER") {
-        const candidate = await User.findOne({ where: { email } })
+    async registration(login, password, role = "USER", name, surname, otchestvo, email) {
+        const candidate = await User.findOne({ where: { login } })
         if (candidate) {
-            throw ApiError.BadRequest(`Пользователь с таким email существует - ${email}`)
+            throw ApiError.BadRequest(`Пользователь с таким email существует - ${login}`)
         }
         const hashPassword = await bcrypt.hash(password, 3)
-        const user = await User.create({ email, password: hashPassword, role })
+        const user = await User.create({ login, password: hashPassword, role, name, surname, otchestvo, email })
+
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({ ...userDto })
         await tokenService.saveToken(userDto.id, tokens.refreshToken)
@@ -21,10 +22,10 @@ class UserService {
 
     }
 
-    async login(email, password) {
-        const user = await User.findOne({ where: { email } })
+    async login(login, password) {
+        const user = await User.findOne({ where: { login } })
         if (!user) {
-            throw ApiError.BadRequest(`Пользователя не существует - ${email}`)
+            throw ApiError.BadRequest(`Пользователя не существует - ${login}`)
         }
         const isPasswordEquals = await bcrypt.compare(password, user.password)
         if (!isPasswordEquals) {

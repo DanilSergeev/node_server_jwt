@@ -9,8 +9,8 @@ class UserController {
             if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest("Ошибка при валидации", errors.array()))
             }
-            const { email, password, role } = req.body
-            const userData = await userService.registration(email, password, role)
+            const { login, password, role, name, surname, otchestvo, email } = req.body
+            const userData = await userService.registration(login, password, role, name, surname, otchestvo, email)
             res.cookie("refreshToken", userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
             return res.json(userData)
         } catch (error) {
@@ -20,8 +20,8 @@ class UserController {
 
     async login(req, res, next) {
         try {
-            const { email, password } = req.body
-            const userData = await userService.login(email, password)
+            const { login, password } = req.body
+            const userData = await userService.login( login, password)
             res.cookie("refreshToken", userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
             return res.json(userData)
         } catch (error) {
