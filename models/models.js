@@ -49,8 +49,9 @@ const Order = sequelize.define('order', {
     name: { type: DataTypes.STRING, },
     count: { type: DataTypes.INTEGER, defaultValue: 0 },
     price: { type: DataTypes.STRING, defaultValue: "0" },
+    FIO: { type: DataTypes.STRING }
     //statusId
-}, { timestamps: false })
+})
 
 const ConfirmOrder = sequelize.define('confirmOrder', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -73,7 +74,7 @@ const Basket_product = sequelize.define('basket_product', {
 
 const Product_info = sequelize.define('product_info', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    model: { type: DataTypes.STRING,  allowNull: true },
+    model: { type: DataTypes.STRING, allowNull: true },
     country: { type: DataTypes.STRING, defaultValue: "Россия", allowNull: true },
     year: { type: DataTypes.STRING, defaultValue: "2023", allowNull: true },
     info: { type: DataTypes.STRING, allowNull: true },
@@ -90,14 +91,33 @@ Product.belongsTo(Category, {
     onDelete: "cascade",
 });
 
-
 TokenSchema.belongsTo(User, {
     foreignKey: 'userId',
     onDelete: "cascade",
 });
 
-Product.hasOne(Product_info, { onDelete: 'CASCADE' });
-Product_info.belongsTo(Product);
+
+
+Product_info.hasOne(Product, { onDelete: 'CASCADE' });
+Product.belongsTo(Product_info,);
+
+
+User.hasOne(Basket, {
+    foreignKey: 'userId',
+    onDelete: "cascade",
+});
+Basket.belongsToMany(Product, { through: Basket_product });
+Product.belongsToMany(Basket, { through: Basket_product });
+
+
+Basket.belongsTo(User, {
+    foreignKey: 'userId',
+    onDelete: "cascade",
+});
+
+
+
+
 
 
 module.exports = {
@@ -105,4 +125,5 @@ module.exports = {
     TokenSchema,
     Product,
     Category,
+    Product_info,
 }
